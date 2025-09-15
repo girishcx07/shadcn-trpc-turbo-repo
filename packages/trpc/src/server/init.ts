@@ -7,6 +7,8 @@
  * The pieces you will need to use are documented accordingly near the end
  */
 import { initTRPC, TRPCError } from "@trpc/server";
+import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
 import superjson from "superjson";
 import { z, ZodError } from "zod/v4";
 
@@ -32,29 +34,29 @@ export const createTRPCContext = async (opts: {
   headers: Headers;
   // auth: Auth;
 }) => {
-  // const cookieStore = await cookies();
-  // const userIdCookie = cookieStore.get(COOKIE_NAME);
+  const cookieStore = await cookies();
+  const userIdCookie = cookieStore.get(COOKIE_NAME);
   // const session = await opts.headers.get("session_id") || ""
   // const authApi = opts.auth.api;
   // const session = await authApi.getSession({
   //   headers: opts.headers,
   // });
 
-  // const session = userIdCookie?.value
-  //   ? {
-  //       userId: userIdCookie.value,
-  //       isAuthenticated: true,
-  //       user: { firstName: "John", lastName: "Doe" },
-  //     }
-  //   : {
-  //       userId: null,
-  //       isAuthenticated: false,
-  //       user: null,
-  //     };
+  const session = userIdCookie?.value
+    ? {
+        userId: userIdCookie.value,
+        isAuthenticated: true,
+        user: { firstName: "John", lastName: "Doe" },
+      }
+    : {
+        userId: null,
+        isAuthenticated: false,
+        user: null,
+      };
 
   return {
     headers: opts.headers,
-    session: null,
+    session,
     // authApi,
     // session,
     // db,

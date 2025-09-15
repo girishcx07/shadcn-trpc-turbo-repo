@@ -1,5 +1,6 @@
 import { createTRPCApiHandler } from "@workspace/trpc/next-handler";
 
-const { GET, POST, OPTIONS } = createTRPCApiHandler({ auth: null });
+const { GET, POST, OPTIONS } = createTRPCApiHandler();
 
-export { GET, POST, OPTIONS };
+
+export { GET, POST, OPTIONS, };

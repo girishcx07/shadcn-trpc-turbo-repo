@@ -24,7 +24,7 @@ export const OPTIONS = () => {
   return response;
 };
 
-export const createTRPCApiHandler = (opts: { auth?: null }) => {
+export const createTRPCApiHandler = () => { // opts: {  } auth: Auth; }
   const handler = async (req: NextRequest) => {
     const response = await fetchRequestHandler({
       endpoint: "/api/trpc",
