@@ -8,7 +8,6 @@
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
 import superjson from "superjson";
 import { z, ZodError } from "zod/v4";
 
