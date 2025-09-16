@@ -7,14 +7,37 @@
  * The pieces you will need to use are documented accordingly near the end
  */
 import { initTRPC, TRPCError } from "@trpc/server";
+import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { cookies } from "next/headers";
 import superjson from "superjson";
 import { z, ZodError } from "zod/v4";
 
+import cookie, { SerializeOptions } from "cookie";
+
 // import type { Auth } from "@acme/auth";
 // import { db } from "@acme/db/client";
 
-const COOKIE_NAME = "auth-user-id";
+export function getCookies(req: Request) {
+  const cookieHeader = req.headers.get("Cookie");
+  if (!cookieHeader) return {};
+  return cookie.parse(cookieHeader);
+}
+
+export function getCookie(req: Request, name: string) {
+  const cookieHeader = req.headers.get("Cookie");
+  if (!cookieHeader) return;
+  const cookies = cookie.parse(cookieHeader);
+  return cookies[name];
+}
+
+export function setCookie(
+  resHeaders: Headers,
+  name: string,
+  value: string,
+  options?: SerializeOptions
+) {
+  resHeaders.append("Set-Cookie", cookie.serialize(name, value, options));
+}
 
 /**
  * 1. CONTEXT
@@ -29,38 +52,47 @@ const COOKIE_NAME = "auth-user-id";
  * @see https://trpc.io/docs/server/context
  */
 
-export const createTRPCContext = async (opts: {
-  headers: Headers;
-  // auth: Auth;
-}) => {
+export const createTRPCContext = async (opts: FetchCreateContextFnOptions) => {
   const cookieStore = await cookies();
-  const userIdCookie = cookieStore.get(COOKIE_NAME);
-  // const session = await opts.headers.get("session_id") || ""
-  // const authApi = opts.auth.api;
-  // const session = await authApi.getSession({
-  //   headers: opts.headers,
-  // });
 
-  const session = userIdCookie?.value
-    ? {
-        userId: userIdCookie.value,
-        isAuthenticated: true,
-        user: { firstName: "John", lastName: "Doe" },
-      }
-    : {
-        userId: null,
-        isAuthenticated: false,
-        user: null,
-      };
+  cookieStore.set("hey", "max");
 
   return {
-    headers: opts.headers,
-    session,
-    // authApi,
-    // session,
-    // db,
+    resHeaders: opts.resHeaders,
+    session: null,
+    getCookie: (name: string) => getCookie(opts.req, name),
+    setCookie: (
+      name: string,
+      value: string,
+      options?: SerializeOptions
+    ) => setCookie(opts.resHeaders, name, value, options),
   };
 };
+
+// export const createTRPCContext = async (opts: {
+//   headers: Headers;
+//   resHeaders: Headers
+// }) => {
+//   const cookieStore = await cookies();
+//   const userIdCookie = cookieStore.get(COOKIE_NAME);
+
+//   const session = userIdCookie?.value
+//     ? {
+//         userId: userIdCookie.value,
+//         isAuthenticated: true,
+//         user: { firstName: "John", lastName: "Doe" },
+//       }
+//     : {
+//         userId: null,
+//         isAuthenticated: false,
+//         user: null,
+//       };
+
+//   return {
+//     headers: opts.headers,
+//     session,
+//   };
+// };
 /**
  * 2. INITIALIZATION
  *

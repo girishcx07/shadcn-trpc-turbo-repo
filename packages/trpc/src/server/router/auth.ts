@@ -4,7 +4,6 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure } from "../init";
 import { loginSchema } from "../../schemas";
 import { cookies } from "next/headers";
-import { xid } from "zod/v4";
 
 // Cookie configuration
 const COOKIE_NAME = "auth-user-id";
@@ -19,35 +18,35 @@ const COOKIE_OPTIONS = {
 
 export const authRouter = {
   getSession: publicProcedure.query(async ({ ctx }) => {
-    const cookieStore = await cookies();
-    const userIdCookie = cookieStore.get(COOKIE_NAME);
-    const expiresAtCookie = cookieStore.get("expiresAt");
-    const createdAtCookie = cookieStore.get("createdAt");
-    const sessionIdCookie = cookieStore.get("sessionId");
+    const { getCookie, setCookie } = ctx;
+    const userIdCookie = getCookie(COOKIE_NAME);
+    const expiresAtCookie = getCookie("expiresAt");
+    const createdAtCookie = getCookie("createdAt");
+    const sessionIdCookie = getCookie("sessionId");
 
     // If no valid session cookie, return null session
-    if (!userIdCookie?.value) {
+    if (!userIdCookie) {
       return { session: null };
     }
 
-    if (expiresAtCookie && new Date(expiresAtCookie.value) < new Date()) {
+    if (expiresAtCookie && new Date(expiresAtCookie) < new Date()) {
       // Session expired, clear cookies
-      cookieStore.set(COOKIE_NAME, "", {
+      setCookie(COOKIE_NAME, "", {
         ...COOKIE_OPTIONS,
         maxAge: 0,
         expires: new Date(0),
       });
-      cookieStore.set("expiresAt", "", {
+      setCookie("expiresAt", "", {
         ...COOKIE_OPTIONS,
         maxAge: 0,
         expires: new Date(0),
       });
-      cookieStore.set("createdAt", "", {
+      setCookie("createdAt", "", {
         ...COOKIE_OPTIONS,
         maxAge: 0,
         expires: new Date(0),
       });
-      cookieStore.set("sessionId", "", {
+      setCookie("sessionId", "", {
         ...COOKIE_OPTIONS,
         maxAge: 0,
         expires: new Date(0),
@@ -60,13 +59,17 @@ export const authRouter = {
 
     const session = userIdCookie
       ? {
-          userId: userIdCookie.value,
+          userId: userIdCookie,
           // In a real app, you might fetch more session details from database
-          createdAt:  createdAtCookie?.value || new Date().toISOString(),
-          expiresAt: expiresAtCookie?.value || new Date(new Date().getTime() + COOKIE_OPTIONS.maxAge * 1000).toISOString(),
-          sessionId: sessionIdCookie?.value || "unknown",
-          userName: cookieStore.get("username")?.value || "unknown",
-          email: cookieStore.get("email")?.value || "unknown",
+          createdAt: createdAtCookie || new Date().toISOString(),
+          expiresAt:
+            expiresAtCookie ||
+            new Date(
+              new Date().getTime() + COOKIE_OPTIONS.maxAge * 1000
+            ).toISOString(),
+          sessionId: sessionIdCookie || "unknown",
+          userName: cookieStore.get("username") || "unknown",
+          email: cookieStore.get("email") || "unknown",
         }
       : null;
 
@@ -93,17 +96,19 @@ export const authRouter = {
 
   login: publicProcedure.input(loginSchema).mutation(async ({ ctx, input }) => {
     try {
+      const { setCookie } = ctx;
       const userId = "user-" + Math.floor(Math.random() * 1000);
+      ctx.resHeaders.set("x-user-id", userId);
 
-      ctx.headers.set("x-user-id", userId);
+      console.log("value>>", userId);
       // For demo purposes, let's simulate user validation
-      const isValidUser = await validateUser(userId);
-      if (!isValidUser) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Invalid user credentials",
-        });
-      }
+      // const isValidUser = await validateUser(userId);
+      // if (!isValidUser) {
+      //   throw new TRPCError({
+      //     code: "UNAUTHORIZED",
+      //     message: "Invalid user credentials",
+      //   });
+      // }
       const userName = input.email.split("@")[0] || "unknown";
       const expiresAt = new Date(
         Date.now() + COOKIE_OPTIONS.maxAge * 1000
@@ -111,16 +116,14 @@ export const authRouter = {
       const createdAt = new Date().toISOString();
       const sessionId = "sess-" + Math.floor(Math.random() * 10000);
 
-
       // Set the authentication cookie
-      const cookieStore = await cookies();
-      cookieStore.set("some-random-cookie", "some-random-value",);
-      cookieStore.set(COOKIE_NAME, userId, COOKIE_OPTIONS);
-      cookieStore.set("email", input.email, COOKIE_OPTIONS);
-      cookieStore.set("username", userName, COOKIE_OPTIONS);
-      cookieStore.set("expiresAt", expiresAt, COOKIE_OPTIONS);
-      cookieStore.set("createdAt", createdAt, COOKIE_OPTIONS);
-      cookieStore.set("sessionId", sessionId, COOKIE_OPTIONS);
+      setCookie("some-random-cookie", "some-random-value");
+      setCookie(COOKIE_NAME, userId, COOKIE_OPTIONS);
+      setCookie("email", input.email, COOKIE_OPTIONS);
+      setCookie("username", userName, COOKIE_OPTIONS);
+      setCookie("expiresAt", expiresAt, COOKIE_OPTIONS);
+      setCookie("createdAt", createdAt, COOKIE_OPTIONS);
+      setCookie("sessionId", sessionId, COOKIE_OPTIONS);
 
       return {
         success: true,
@@ -144,31 +147,30 @@ export const authRouter = {
     }
   }),
 
-logout: publicProcedure.mutation(async () => {
-  const cookieStore = await cookies();
+  logout: publicProcedure.mutation(async () => {
+    const cookieStore = await cookies();
 
-  // Clear cookies regardless of whether they exist
-  for (const name of [
-    COOKIE_NAME,
-    "expiresAt",
-    "createdAt",
-    "sessionId",
-    "email",
-    "username",
-  ]) {
-    cookieStore.set(name, "", {
-      ...COOKIE_OPTIONS,
-      maxAge: 0,
-      expires: new Date(0),
-    });
-  }
+    // Clear cookies regardless of whether they exist
+    for (const name of [
+      COOKIE_NAME,
+      "expiresAt",
+      "createdAt",
+      "sessionId",
+      "email",
+      "username",
+    ]) {
+      cookieStore.set(name, "", {
+        ...COOKIE_OPTIONS,
+        maxAge: 0,
+        expires: new Date(0),
+      });
+    }
 
-  return {
-    success: true,
-    message: "Logged out (or already logged out)",
-  };
-}),
-
+    return {
+      success: true,
+      message: "Logged out (or already logged out)",
+    };
+  }),
 
   // Additional utility procedure
   refreshSession: publicProcedure.mutation(async ({ ctx }) => {

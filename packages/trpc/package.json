@@ -22,7 +22,7 @@
     },
     "./server-trpc": {
       "types": "./src/trpc.tsx",
-      "default": "./src/trpc.tsx" 
+      "default": "./src/trpc.tsx"
     },
     "./react": {
       "types": "./src/react.tsx",
@@ -43,11 +43,13 @@
     "@trpc/react-query": "^11.5.1",
     "@trpc/server": "^11.5.1",
     "@trpc/tanstack-react-query": "^11.5.1",
+    "cookie": "^1.0.2",
     "presets-zod": "link:@t3-oss/env-nextjs/presets-zod",
     "superjson": "^2.2.1",
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/cookie": "^1.0.0",
     "@types/node": "^24.3.3",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",

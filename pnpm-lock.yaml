@@ -166,6 +166,9 @@ importers:
       '@trpc/tanstack-react-query':
         specifier: ^11.5.1
         version: 11.5.1(@tanstack/react-query@5.87.4(react@19.1.1))(@trpc/client@11.5.1(@trpc/server@11.5.1(typescript@5.9.2))(typescript@5.9.2))(@trpc/server@11.5.1(typescript@5.9.2))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)
+      cookie:
+        specifier: ^1.0.2
+        version: 1.0.2
       presets-zod:
         specifier: link:@t3-oss/env-nextjs/presets-zod
         version: link:@t3-oss/env-nextjs/presets-zod
@@ -176,6 +179,9 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
+      '@types/cookie':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@types/node':
         specifier: ^24.3.3
         version: 24.3.3
@@ -992,6 +998,10 @@ packages:
     resolution: {integrity: sha512-Gye68+szmOp96xMvmondTRQYcYvevDqUP9JuN9jC6kqzFel7U1pJ/hoPvyD3WGQNxyKsdF+wJ5fvNaYXkzr6tQ==}
     hasBin: true
 
+  '@types/cookie@1.0.0':
+    resolution: {integrity: sha512-mGFXbkDQJ6kAXByHS7QAggRXgols0mAdP4MuXgloGY1tXokvzaFFM4SMqWvf7AH0oafI7zlFJwoGWzmhDqTZ9w==}
+    deprecated: This is a stub types definition. cookie provides its own type definitions, so you do not need this installed.
+
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -1314,6 +1324,10 @@ packages:
 
   constant-case@2.0.0:
     resolution: {integrity: sha512-eS0N9WwmjTqrOmR3o83F5vW8Z+9R1HnVz3xmzT2PMFug9ly+Au/fxRWlEBSb6LcZwspSsEn9Xs1uw9YgzAg1EQ==}
+
+  cookie@1.0.2:
+    resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
+    engines: {node: '>=18'}
 
   copy-anything@3.0.5:
     resolution: {integrity: sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==}
@@ -3537,6 +3551,10 @@ snapshots:
       semver: 7.6.2
       update-check: 1.5.4
 
+  '@types/cookie@1.0.0':
+    dependencies:
+      cookie: 1.0.2
+
   '@types/estree@1.0.8': {}
 
   '@types/glob@7.2.0':
@@ -3936,6 +3954,8 @@ snapshots:
     dependencies:
       snake-case: 2.1.0
       upper-case: 1.1.3
+
+  cookie@1.0.2: {}
 
   copy-anything@3.0.5:
     dependencies:
