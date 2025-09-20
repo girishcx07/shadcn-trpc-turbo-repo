@@ -1,0 +1,1 @@
+export * from "@workspace/orpc/handler/rpc-handler"

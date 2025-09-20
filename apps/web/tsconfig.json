@@ -4,7 +4,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@workspace/ui/*": ["../../packages/ui/src/*"]
+      "@workspace/ui/*": ["../../packages/ui/src/*"],
+      "@workspace/orpc/*": ["../../packages/orpc/src/*"],
+      "@workspace/trpc/*": ["../../packages/trpc/src/*"]
     },
     "plugins": [
       {

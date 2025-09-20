@@ -2,16 +2,9 @@ import { HydrateClient, prefetch, trpc } from "@workspace/trpc/server-trpc";
 import { Suspense } from "react";
 // import AuthButton from "./_components/auth-button";
 import { PostCardSkeleton, PostList } from "./_components/posts";
-import AuthButton from "./_components/auth-button";
 
 export default function Page() {
-  prefetch(
-    trpc.post.all.queryOptions({
-      category: "All",
-    })
-  );
 
-  prefetch(trpc.auth.getSession.queryOptions());
 
   return (
     <HydrateClient>
@@ -20,7 +13,7 @@ export default function Page() {
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
             Create <span className="text-primary">T3</span> Turbo
           </h1>
-          <AuthButton />
+          {/* <AuthButton /> */}
 
           {/* <CreatePostForm /> */}
           <div className="w-full max-w-2xl overflow-y-scroll">
@@ -33,7 +26,7 @@ export default function Page() {
                 </div>
               }
             >
-              <PostList />
+              {/* <PostList /> */}
             </Suspense>
           </div>
         </div>
