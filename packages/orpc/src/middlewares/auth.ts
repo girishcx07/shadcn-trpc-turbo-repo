@@ -2,6 +2,7 @@ import { ORPCError, os } from "@orpc/server";
 import { User } from "../schemas/user";
 
 import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 
 export const users = [
@@ -28,10 +29,11 @@ export const requiredAuthMiddleware = os
      */
     const session = context.session ?? (await getSession());
 
-    console.log("session :", session)
+    // console.log("session :", session)
 
     if (!session || !session.user) {
-      throw new ORPCError("UNAUTHORIZED");
+      redirect("/some-where")
+      // throw new ORPCError("UNAUTHORIZED");
     }
 
     return next({

@@ -7,15 +7,12 @@ import getQueryClient from "@/lib/query-client";
 export default async function Page() {
   const queryClient = getQueryClient();
 
+  await queryClient.prefetchQuery(orpc.auth.me.queryOptions());
   // Prefetch todos for faster initial render
-   queryClient.prefetchQuery(
+  queryClient.prefetchQuery(
     orpc.todo.getTodos.queryOptions({
       input: { amount: 5 },
     })
-  );
-
-   queryClient.prefetchQuery(
-    orpc.auth.me.queryOptions()
   );
 
   return (

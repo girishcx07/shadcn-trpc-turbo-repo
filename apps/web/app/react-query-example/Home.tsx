@@ -34,6 +34,7 @@ function TodoList() {
   const { data, error } = useSuspenseQuery(
     orpc.todo.getTodos.queryOptions({
       input: { amount: 5 },
+      enabled: false
     })
   );
 
