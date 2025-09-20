@@ -35,6 +35,10 @@ function TodoList() {
     })
   );
 
+  if(error?.message === "UNAUTHORIZED"){
+    console.log('redirected >>')
+  }
+
   console.log("error =>", { error})
   
 

@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { client, orpc } from "@workspace/orpc/lib/orpc";
 import {
   Form,
@@ -27,12 +27,12 @@ import {
 } from "@workspace/ui/components/form";
 import { Credential, CredentialSchema } from "@workspace/orpc/schemas/auth";
 import { useSession } from "../_hooks/use-session";
+import { toast } from "sonner";
 
 export function LoginButton() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // 🔑 Fetch current session
   const { data: session } = useSession();
@@ -47,17 +47,16 @@ export function LoginButton() {
   const signinMutation = useMutation(
     orpc.auth.signin.mutationOptions({
       onSuccess: async (res) => {
-        console.log();
+        console.log(res.token);
         await queryClient.invalidateQueries({
           queryKey: orpc.auth.me.queryKey(),
         });
         setOpen(false);
         form.reset();
-        setError(null);
         router.refresh();
       },
-      onError: (err: any) => {
-        setError(err?.message ?? "Invalid credentials");
+      onError: (err) => {
+        toast.error(err?.message ?? "Invalid credentials");
       },
     })
   );
@@ -134,7 +133,6 @@ export function LoginButton() {
                   </FormItem>
                 )}
               />
-              {error && <p className="text-sm text-red-500">{error}</p>}
             </div>
 
             <DialogFooter>
