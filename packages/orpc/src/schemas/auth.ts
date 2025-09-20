@@ -8,3 +8,5 @@ export const CredentialSchema = z.object({
 export const TokenSchema = z.object({
   token: z.string(),
 });
+
+export type Credential = z.infer<typeof CredentialSchema>;

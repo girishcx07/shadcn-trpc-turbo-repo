@@ -13,12 +13,12 @@ export const users = [
   },
 ];
 
-const auth = os.errors({
-  UNAUTHORIZED: {}
-})
+// const auth = os.errors({
+//   UNAUTHORIZED: {}
+// })
 
 
-export const requiredAuthMiddleware = auth
+export const requiredAuthMiddleware = os
   .$context<{ session?: { user?: User } }>()
   .middleware(async ({ context, next }) => {
     /**
@@ -28,12 +28,15 @@ export const requiredAuthMiddleware = auth
      */
     const session = context.session ?? (await getSession());
 
+    console.log("session :", session)
+
     if (!session || !session.user) {
       throw new ORPCError("UNAUTHORIZED");
     }
 
     return next({
       context: {
+        ...context,
         user: session.user,
         headers: await headers(),
         cookies: await cookies(),
@@ -49,31 +52,21 @@ export const base = os.use(async ({ next }) => next({
   },
 }))
 
-
 export async function getSession() {
-  // 1️⃣ Get cookies from the request
   const cookieStore = await cookies();
-  const token = cookieStore.get("session")?.value;
+  const raw = cookieStore.get("session")?.value;
 
-  if (!token) {
-    return null; // no session
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      user: parsed,
+    };
+  } catch {
+    return null; // corrupted session
   }
-
-  // 2️⃣ Look up user by token
-  const user = users.find((u) => u.id === token);
-
-  if (!user) {
-    return null; // invalid session
-  }
-
-  // 3️⃣ Return session object
-  return {
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    },
-  };
 }
+
 
 export const authed = os.use(requiredAuthMiddleware);

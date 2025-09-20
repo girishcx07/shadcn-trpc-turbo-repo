@@ -14,6 +14,10 @@ export default async function Page() {
     })
   );
 
+   queryClient.prefetchQuery(
+    orpc.auth.me.queryOptions()
+  );
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Home />

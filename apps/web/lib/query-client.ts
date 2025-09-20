@@ -5,7 +5,13 @@ let client: QueryClient | null = null;
 
 export default function getQueryClient() {
   if (!client) {
-    client = new QueryClient();
+    client = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: 3
+        }
+      }
+    });
   }
   return client;
 }

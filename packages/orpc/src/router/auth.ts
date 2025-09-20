@@ -2,6 +2,7 @@ import { os } from "@orpc/server";
 import { CredentialSchema, TokenSchema } from "../schemas/auth";
 import { NewUserSchema, UserSchema } from "../schemas/user";
 import { authed, base, users } from "../middlewares/auth";
+import * as z from "zod";
 
 export const signup = os
   .route({
@@ -20,19 +21,6 @@ export const signup = os
     };
   });
 
-// export const signin = os
-//   .route({
-//     method: "POST",
-//     path: "/auth/signin",
-//     summary: "Sign in a user",
-//     tags: ["Authentication"],
-//   })
-//   .input(CredentialSchema)
-//   .output(TokenSchema)
-//   .handler(async ({ input, context }) => {
-//     return { token: "token" };
-//   });
-
 export const me = authed
   .route({
     method: "GET",
@@ -40,14 +28,42 @@ export const me = authed
     summary: "Get the current user",
     tags: ["Authentication"],
   })
-  .output(UserSchema)
-  .handler(async ({ input, context }) => {
-    return context.user;
+  .output(
+    z.object({
+      user: UserSchema,
+    })
+  ) // <-- return { user: User }
+  .handler(async ({ context }) => {
+    // context.user comes from authed middleware
+    return { user: context.user };
   });
 
+  export const logout = authed
+  .route({
+    method: "POST",
+    path: "/auth/logout",
+    summary: "Log out the current user",
+    tags: ["Authentication"],
+  })
+  .output(
+    z.object({
+      success: z.boolean(),
+    })
+  )
+  .handler(async ({ context }) => {
+    // ✅ Clear cookie
+    context.cookies.set("session", "", {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 0, // expire immediately
+    });
 
+    return { success: true };
+  });
 
-  export const signin = base
+export const signin = base
   .route({
     method: "POST",
     path: "/auth/signin",
@@ -57,18 +73,31 @@ export const me = authed
   .input(CredentialSchema)
   .output(TokenSchema)
   .handler(async ({ input, context }) => {
+    // 1️⃣ Verify user
     const user = users.find(
       (u) => u.email === input.email && u.password === input.password
     );
+
     if (!user) {
       throw new Error("Invalid credentials");
     }
 
-    const token = user.id; // for demo, use user.id as session token
+    // 2️⃣ Build the session payload (store minimal required info)
+    const sessionData = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    };
 
-    // Attach cookie to response
-    context.cookies.set("token", token)
-    // context.(context.res, token);
+    // 3️⃣ Serialize session to cookie
+    context.cookies.set("session", JSON.stringify(sessionData), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
 
-    return { token };
+    // 4️⃣ Return token just for debugging
+    return { token: user.id };
   });

@@ -1,10 +1,9 @@
 import { HydrateClient, prefetch, trpc } from "@workspace/trpc/server-trpc";
 import { Suspense } from "react";
 // import AuthButton from "./_components/auth-button";
-import { PostCardSkeleton, PostList } from "./_components/posts";
+import { PostCardSkeleton, PostList } from "./react-query-example/_components/posts";
 
 export default function Page() {
-
 
   return (
     <HydrateClient>
