@@ -12,10 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import { LoginButton } from "./_components/login-btn";
 
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center mt-36 w-full">
+      <LoginButton />
       <TanstackForm />
 
       {/* Wrap in ErrorBoundary + Suspense */}
