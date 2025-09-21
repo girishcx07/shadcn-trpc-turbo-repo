@@ -75,6 +75,9 @@ export function LoginButton() {
         // router.refresh();
       },
       onError: (err) => {
+        // if(isDefinedError(err)){
+        //   err.code === ""
+        // }
         toast.error(err?.message ?? "Something went wrong while logging out.");
       },
     })
