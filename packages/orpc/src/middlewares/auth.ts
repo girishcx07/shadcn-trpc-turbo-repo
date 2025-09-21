@@ -8,9 +8,9 @@ import { redirect } from "next/navigation";
 export const users = [
   {
     id: "28aa6286-48e9-4f23-adea-3486c86acd55",
-    email: "demo@example.com",
+    email: "test@gmail.com",
     name: "Demo User",
-    password: "password123", // ⚠️ plaintext only for demo! Use hashing in real apps
+    password: "Smart@123", // ⚠️ plaintext only for demo! Use hashing in real apps
   },
 ];
 
@@ -32,8 +32,8 @@ export const requiredAuthMiddleware = os
     // console.log("session :", session)
 
     if (!session || !session.user) {
-      redirect("/some-where")
-      // throw new ORPCError("UNAUTHORIZED");
+      // redirect("/some-where")
+      throw new ORPCError("UNAUTHORIZED");
     }
 
     return next({

@@ -50,7 +50,23 @@ export const me = authed
       success: z.boolean(),
     })
   )
-  .handler(async ({ context }) => {
+  .errors({
+    UNAUTHORIZED: {
+      message: "You were already logged out."
+    }, 
+    INTERNAL_SERVER_ERROR: {
+      message: "Server error. Please try again later."
+    },
+    BAD_REQUEST: {
+      message: "Something went wrong while logging out."
+    }
+  })
+  .handler(async ({ context, errors }) => {
+
+    const session = context.cookies.get("session")?.value
+    if(!session){
+      errors.UNAUTHORIZED()
+    }
     // ✅ Clear cookie
     context.cookies.set("session", "", {
       httpOnly: true,
@@ -59,6 +75,7 @@ export const me = authed
       path: "/",
       maxAge: 0, // expire immediately
     });
+
 
     return { success: true };
   });

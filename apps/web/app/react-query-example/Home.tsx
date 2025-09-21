@@ -17,7 +17,7 @@ import { LoginButton } from "./_components/login-btn";
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center mt-36 w-full">
-      <LoginButton />
+      <LoginButton /> 
       <TanstackForm />
 
       {/* Wrap in ErrorBoundary + Suspense */}

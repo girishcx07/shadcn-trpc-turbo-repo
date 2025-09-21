@@ -28,6 +28,7 @@ import {
 import { Credential, CredentialSchema } from "@workspace/orpc/schemas/auth";
 import { useSession } from "../_hooks/use-session";
 import { toast } from "sonner";
+import { isDefinedError } from "@orpc/client";
 
 export function LoginButton() {
   const router = useRouter();
@@ -53,7 +54,8 @@ export function LoginButton() {
         });
         setOpen(false);
         form.reset();
-        router.refresh();
+        router.push('/react-query-example')
+        // router.refresh();
       },
       onError: (err) => {
         toast.error(err?.message ?? "Invalid credentials");
@@ -61,12 +63,32 @@ export function LoginButton() {
     })
   );
 
+  // ✅ Mutation for login
+  const logoutMutation = useMutation(
+    orpc.auth.logout.mutationOptions({
+      onSuccess: async (res) => {
+         queryClient.removeQueries({
+          queryKey: orpc.auth.me.queryKey(),
+        });
+        form.reset();
+        router.push('/react-query-example')
+        // router.refresh();
+      },
+      onError: (err) => {
+        toast.error(err?.message ?? "Something went wrong while logging out.");
+      },
+    })
+  );
 
   async function handleLogout() {
-    await client.auth.logout()
-    await queryClient.invalidateQueries({ queryKey: orpc.auth.me.queryKey() });
-    
-    router.refresh();
+    await logoutMutation.mutateAsync({});
+
+    // await client.auth.logout()
+    //  queryClient.invalidateQueries({ queryKey: orpc.auth.me.queryKey() });
+    //   queryClient.removeQueries({
+    //     queryKey: orpc.auth.me.queryKey()
+    //   });
+    // router.refresh();
   }
 
   if (session?.user) {
