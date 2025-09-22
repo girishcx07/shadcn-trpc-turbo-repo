@@ -23,7 +23,7 @@ export default function Home() {
       {/* Wrap in ErrorBoundary + Suspense */}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Suspense fallback={<TodoListSkeleton />}>
-          <TodoList />
+          <TodoList /> 
         </Suspense>
       </ErrorBoundary>
     </main>
@@ -34,7 +34,6 @@ function TodoList() {
   const { data, error } = useSuspenseQuery(
     orpc.todo.getTodos.queryOptions({
       input: { amount: 5 },
-      enabled: false
     })
   );
 

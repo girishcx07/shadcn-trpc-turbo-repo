@@ -9,10 +9,14 @@ export default async function Page() {
 
   await queryClient.prefetchQuery(orpc.auth.me.queryOptions());
   // Prefetch todos for faster initial render
+  // queryClient.prefetchQuery(
+  //   orpc.todo.getTodos.queryOptions({
+  //     input: { amount: 5 },
+  //   })
+  // );
+
   queryClient.prefetchQuery(
-    orpc.todo.getTodos.queryOptions({
-      input: { amount: 5 },
-    })
+    orpc.todo.getTodos.queryOptions({ input: { amount: 5 } })
   );
 
   return (

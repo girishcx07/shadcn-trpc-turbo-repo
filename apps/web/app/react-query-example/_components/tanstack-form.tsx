@@ -1,18 +1,20 @@
 "use client";
 
+import { isDefinedError } from "@orpc/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { client, orpc } from "@workspace/orpc/lib/orpc";
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
 } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
-import { Button } from "@workspace/ui/components/button";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { orpc } from "@workspace/orpc/lib/orpc";
+import { useRef } from "react";
 import { toast } from "sonner";
 
 interface TodoFormValues {
@@ -23,23 +25,56 @@ interface TodoFormValues {
 
 export function TanstackForm() {
   const queryClient = useQueryClient();
-  // 2. Set up the mutation
-  const createTodoMutation = useMutation(
-    orpc.todo.createTodo.mutationOptions({
-      onSuccess: (newTodo) => {
-        toast.success(`Todo "${newTodo.title}" created successfully!`);
 
-        // Invalidate channel queries to refetch the list
-        queryClient.invalidateQueries({
-          queryKey: orpc.todo.getTodos.queryKey({ input: { amount: 5 } }),
-        });
-      },
-      onError: () => {
-        // Generic error fallback
-        toast.error("Failed to create todo. Please try again.");
-      },
-    })
-  );
+  const abortRef = useRef<AbortController | null>(null);
+
+  // 2. Set up the mutation
+  const createTodoMutation = useMutation({
+    mutationFn: async (values: {
+      title: string;
+      body: string;
+      userId: number;
+    }) => {
+      abortRef.current = new AbortController();
+
+      // Call ORPC procedure directly with signal
+      // `orpc.todo.createTodo` returns a promise, so just await it
+      return await client.todo.createTodo(values, {
+        // signal: abortRef.current.signal,
+      });
+    },
+    onSuccess: (data) => {
+      toast.success("TODO created successfully");
+      queryClient.invalidateQueries({
+        queryKey: orpc.todo.getTodos.queryKey({ input: { amount: 5 } }),
+      });
+    },
+    onError: (err: any) => {
+      if (err.name === "AbortError") {
+        toast.error("Mutation cancelled");
+      } else {
+        toast.error("Mutation failed", err);
+      }
+    },
+  });
+
+  // const createTodoMutation = useMutation(
+  //   orpc.todo.createTodo.mutationOptions({
+
+  //     onSuccess: (newTodo) => {
+  //       toast.success(`Todo "${newTodo.title}" created successfully!`);
+
+  //       // Invalidate channel queries to refetch the list
+  //       queryClient.invalidateQueries({
+  //         queryKey: orpc.todo.getTodos.queryKey({ input: { amount: 5 } }),
+  //       });
+  //     },
+  //     onError: () => {
+  //       // Generic error fallback
+  //       toast.error("Failed to create todo. Please try again.");
+  //     },
+  //   })
+  // );
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,6 +97,12 @@ export function TanstackForm() {
       },
     });
   }
+
+  const handleCancel = () => {
+    abortRef.current?.abort(); // cancel the in-flight request
+    abortRef.current = null;
+    createTodoMutation.reset(); // reset mutation state
+  };
 
   return (
     <div className="mx-auto w-full max-w-md space-y-6">
@@ -94,6 +135,16 @@ export function TanstackForm() {
             </div>
           </CardContent>
           <CardFooter>
+            {createTodoMutation.isPending && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+            )}
+
             <Button
               type="submit"
               disabled={createTodoMutation.isPending}

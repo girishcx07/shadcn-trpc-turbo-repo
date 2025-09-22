@@ -45,10 +45,12 @@ export const createTodo = authed
       status: 502,
     },
   })
-  .handler(async ({ input, errors, context }) => {
-    console.log("input >>", input)
+  .handler(async ({ input, errors, context, signal }) => {
+    console.log("input >>", input);
 
-    context.cookies.set("input", input.title)
+    context.cookies.set("input", input.title);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     try {
       const response = await fetch(
         "https://jsonplaceholder.typicode.com/posts",
@@ -58,6 +60,7 @@ export const createTodo = authed
             "Content-type": "application/json; charset=UTF-8",
           },
           body: JSON.stringify(input),
+          signal,
         }
       );
 
@@ -67,7 +70,6 @@ export const createTodo = authed
         throw errors.BAD_RESPONSE();
       }
 
-
       const data = await response.json();
       return TodoSchema.parse(data);
     } catch (err) {
@@ -75,8 +77,7 @@ export const createTodo = authed
 
       throw errors.BAD_RESPONSE();
     }
-  });
-
+  }).actionable();
 // export const getTodos = authed
 //   .input(
 //     z.object({
@@ -132,12 +133,12 @@ export const getTodos = authed
         throw errors.BAD_RESPONSE();
       }
 
-      const data = await response.json() as Post[];
+      const data = (await response.json()) as Post[];
 
       // Validate all todos with Zod
       const todos = z.array(TodoSchema).parse(data);
       // todos.
-      return data.slice(0, input.amount)
+      return data.slice(0, input.amount);
       // return todos.slice(0, input.amount);
     } catch (err) {
       throw errors.BAD_RESPONSE();
