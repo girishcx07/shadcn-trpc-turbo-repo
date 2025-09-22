@@ -40,7 +40,7 @@ export function TanstackForm() {
       // Call ORPC procedure directly with signal
       // `orpc.todo.createTodo` returns a promise, so just await it
       return await client.todo.createTodo(values, {
-        // signal: abortRef.current.signal,
+        signal: abortRef.current.signal,
       });
     },
     onSuccess: (data) => {
