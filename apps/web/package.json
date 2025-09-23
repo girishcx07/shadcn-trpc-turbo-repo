@@ -12,11 +12,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.2.1",
+    "@hookform/resolvers": "^5.2.2",
     "@orpc/client": "^1.8.9",
     "@tanstack/react-query": "^5.87.4",
     "@workspace/orpc": "workspace:*",
-    "@workspace/trpc": "workspace:*",
     "@workspace/ui": "workspace:*",
     "lucide-react": "^0.475.0",
     "next": "^15.4.5",

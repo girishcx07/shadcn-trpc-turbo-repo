@@ -1,9 +1,7 @@
-import { HydrateClient } from "@workspace/trpc/server-trpc";
 import { LoginButton } from "./react-query-example/_components/login-btn";
 
 export default function Page() {
   return (
-    <HydrateClient>
       <main className="container h-screen py-16">
         <div className="flex flex-col items-center justify-center gap-4">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
@@ -20,6 +18,5 @@ export default function Page() {
           </div>
         </div>
       </main>
-    </HydrateClient>
   );
 }

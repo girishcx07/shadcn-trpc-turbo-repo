@@ -1,3 +1,6 @@
+'use server'
+
+
 import { ORPCError, os } from "@orpc/server";
 import z from "zod";
 import { TodoSchema } from "../schemas/todo";
@@ -143,4 +146,4 @@ export const getTodos = authed
     } catch (err) {
       throw errors.BAD_RESPONSE();
     }
-  });
+  }).actionable();

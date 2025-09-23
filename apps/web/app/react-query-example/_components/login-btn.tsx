@@ -25,10 +25,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
-import { Credential, CredentialSchema } from "@workspace/orpc/schemas/auth";
+// import { Credential, CredentialSchema } from "@workspace/orpc/schemas/auth";
 import { useSession } from "../_hooks/use-session";
 import { toast } from "sonner";
 import { isDefinedError } from "@orpc/client";
+import { Credential, CredentialSchema } from "@workspace/orpc/schemas/auth";
 
 export function LoginButton() {
   const router = useRouter();
