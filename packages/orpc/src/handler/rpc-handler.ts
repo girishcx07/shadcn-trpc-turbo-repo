@@ -1,7 +1,10 @@
+import { BatchHandlerPlugin } from "@orpc/server/plugins";
 import { router } from "../router";
 import { RPCHandler } from "@orpc/server/fetch";
 
-const handler = new RPCHandler(router);
+const handler = new RPCHandler(router, {
+  plugins: [new BatchHandlerPlugin()]
+});
 
 async function handleRequest(request: Request) {
   const { response } = await handler.handle(request, {

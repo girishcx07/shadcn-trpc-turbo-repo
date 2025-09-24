@@ -1,8 +1,9 @@
-import { createORPCClient,  isDefinedError,  onError } from "@orpc/client";
+import { createORPCClient, isDefinedError, onError } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterClient } from "@orpc/server";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { router } from "../router";
+import { BatchLinkPlugin } from "@orpc/client/plugins";
 
 declare global {
   var $client: RouterClient<typeof router> | undefined;
@@ -15,6 +16,19 @@ const link = new RPCLink({
     }
     return `${window.location.origin}/rpc`;
   },
+  plugins: [
+    new BatchLinkPlugin({
+      mode: "buffered",
+      // mode: typeof window === "undefined" ? "buffered" : "streaming",
+      groups: [
+        {
+          condition: (options) => true,
+          context: {},
+        },
+      ],
+    }),
+    
+  ],
   // interceptors: [
   //   onError(async (error) => {
   //     console.log("error >", error);

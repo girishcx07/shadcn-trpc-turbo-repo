@@ -6,7 +6,7 @@
   "exports": {
     "./schemas/*": "./src/schemas/*.ts",
     "./api-handler": "./src/handler/api-hanlder.ts",
-    "./trpc-handler": "./src/handler/trpc-hanlder.ts",
+    "./rpc-handler": "./src/handler/rpc-hanlder.ts",
     "./orpc": "./src/lib/orpc.ts",
     "./orpc.server": "./src/lib/orpc.server.ts"
   },
